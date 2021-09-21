@@ -46,4 +46,4 @@ jobs:
         app-name: 'maksim-eshop'
         slot-name: 'staging'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_c36ebec98ef643c7b46f81b8b70db6c6 }}
-        package: .
+        package: ${{env.DOTNET_ROOT}}/myapp

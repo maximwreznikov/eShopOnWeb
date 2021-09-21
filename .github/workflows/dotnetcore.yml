@@ -44,6 +44,6 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'maksim-eshop'
-        slot-name: 'staging'
+        slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_c36ebec98ef643c7b46f81b8b70db6c6 }}
         package: ${{env.DOTNET_ROOT}}/myapp

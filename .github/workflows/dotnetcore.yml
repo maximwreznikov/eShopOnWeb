@@ -16,9 +16,6 @@ jobs:
 
     - name: Build with dotnet
       run: dotnet build ./eShopOnWeb.sln --configuration Release
-    
-    - name: Test with dotnet
-      run: dotnet test  --configuration Release
       
     - name: dotnet publish
       run: dotnet publish ./eShopOnWeb.sln -c Release -o ${{env.DOTNET_ROOT}}/myapp

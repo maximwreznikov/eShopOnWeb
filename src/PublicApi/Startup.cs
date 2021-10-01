@@ -19,7 +19,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace Microsoft.eShopWeb.PublicApi
@@ -95,7 +98,7 @@ namespace Microsoft.eShopWeb.PublicApi
             services.AddScoped<ITokenClaimsService, IdentityTokenClaimService>();
 
             var baseUrlConfig = new BaseUrlConfiguration();
-            Configuration.Bind(BaseUrlConfiguration.CONFIG_NAME, baseUrlConfig);            
+            Configuration.Bind(BaseUrlConfiguration.CONFIG_NAME, baseUrlConfig);
 
             services.AddMemoryCache();
 
@@ -134,7 +137,12 @@ namespace Microsoft.eShopWeb.PublicApi
             services.AddAutoMapper(typeof(Startup).Assembly);
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Maksim eshops API", Version = "v1" });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+
                 c.EnableAnnotations();
                 c.SchemaFilter<CustomSchemaFilters>();
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -167,6 +175,8 @@ namespace Microsoft.eShopWeb.PublicApi
                     }
                 });
             });
+
+            services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_CONNECTIONSTRING"]);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -192,7 +202,7 @@ namespace Microsoft.eShopWeb.PublicApi
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Maksim eshops API V1");
             });
 
             app.UseEndpoints(endpoints =>

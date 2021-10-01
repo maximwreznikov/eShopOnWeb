@@ -6,6 +6,7 @@ using Microsoft.eShopWeb.Infrastructure.Identity;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
 
 namespace Microsoft.eShopWeb.PublicApi.AuthEndpoints
 {
@@ -16,11 +17,15 @@ namespace Microsoft.eShopWeb.PublicApi.AuthEndpoints
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ITokenClaimsService _tokenClaimsService;
 
+        private readonly TelemetryClient _telemetry;
+
         public Authenticate(SignInManager<ApplicationUser> signInManager,
-            ITokenClaimsService tokenClaimsService)
+            ITokenClaimsService tokenClaimsService,
+            TelemetryClient telemetry)
         {
             _signInManager = signInManager;
             _tokenClaimsService = tokenClaimsService;
+            _telemetry = telemetry;
         }
 
         [HttpPost("api/authenticate")]
@@ -47,7 +52,12 @@ namespace Microsoft.eShopWeb.PublicApi.AuthEndpoints
 
             if (result.Succeeded)
             {
+                _telemetry.TrackEvent("authenticate user");
                 response.Token = await _tokenClaimsService.GetTokenAsync(request.Username);
+            }
+            else
+            {
+                _telemetry.TrackEvent("authenticate failure");
             }
 
             return response;

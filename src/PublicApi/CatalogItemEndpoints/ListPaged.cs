@@ -19,14 +19,17 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints
         private readonly IAsyncRepository<CatalogItem> _itemRepository;
         private readonly IUriComposer _uriComposer;
         private readonly IMapper _mapper;
+        private readonly IAppLogger<ListPaged> _logger;
 
         public ListPaged(IAsyncRepository<CatalogItem> itemRepository,
             IUriComposer uriComposer,
-            IMapper mapper)
+            IMapper mapper,
+            IAppLogger<ListPaged> logger)
         {
             _itemRepository = itemRepository;
             _uriComposer = uriComposer;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet("api/catalog-items")]
@@ -38,6 +41,8 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints
         ]
         public override async Task<ActionResult<ListPagedCatalogItemResponse>> HandleAsync([FromQuery] ListPagedCatalogItemRequest request, CancellationToken cancellationToken)
         {
+            throw new Exception("Cannot move further");
+
             var response = new ListPagedCatalogItemResponse(request.CorrelationId());
 
             var filterSpec = new CatalogFilterSpecification(request.CatalogBrandId, request.CatalogTypeId);
@@ -50,6 +55,8 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints
                 typeId: request.CatalogTypeId);
 
             var items = await _itemRepository.ListAsync(pagedSpec, cancellationToken);
+            
+            _logger.LogInformation($"Return {items.Count} items from database");
 
             response.CatalogItems.AddRange(items.Select(_mapper.Map<CatalogItemDto>));
             foreach (CatalogItemDto item in response.CatalogItems)
@@ -57,6 +64,7 @@ namespace Microsoft.eShopWeb.PublicApi.CatalogItemEndpoints
                 item.PictureUri = _uriComposer.ComposePicUri(item.PictureUri);
             }
             response.PageCount = int.Parse(Math.Ceiling((decimal)totalItems / request.PageSize).ToString());
+
 
             return Ok(response);
         }

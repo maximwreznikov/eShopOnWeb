@@ -15,7 +15,7 @@ namespace OrderItemsReserver
     {
         [FunctionName("create_order")]
         public static async Task<IActionResult> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req, 
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req, 
             IBinder binder,
             ILogger log)
         {
@@ -24,7 +24,7 @@ namespace OrderItemsReserver
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             
-            var orderId = Guid.NewGuid();
+            var orderId = (int)data.Id;
             var outboundBlob = new BlobAttribute($"orders/{orderId}.json", FileAccess.Write);
             await using var writer = binder.Bind<Stream>(outboundBlob);
 

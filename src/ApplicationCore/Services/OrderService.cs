@@ -53,8 +53,8 @@ namespace Microsoft.eShopWeb.ApplicationCore.Services
             
             var orderItem = await _orderRepository.AddAsync(order);
 
-            // TODO: send message to azure function
-            _orderCreator.SaveOrderAsync(orderItem);
+            // send message to azure function
+            await _orderCreator.SaveOrderAsync(orderItem);
         }
     }
 }

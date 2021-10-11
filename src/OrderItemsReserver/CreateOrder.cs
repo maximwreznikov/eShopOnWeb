@@ -24,7 +24,7 @@ namespace OrderItemsReserver
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             
-            var orderId = (int)data.Id;
+            var orderId = (int)data.id;
             var outboundBlob = new BlobAttribute($"orders/{orderId}.json", FileAccess.Write);
             await using var writer = binder.Bind<Stream>(outboundBlob);
 
